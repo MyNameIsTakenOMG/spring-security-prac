@@ -42,10 +42,10 @@ public class SecurityConfig {
 //                .build();
 //        return new InMemoryUserDetailsManager(admin,user);
 //    }
-    @Bean
-    public JdbcUserDetailsManager userDetailsService(DataSource dataSource){
-        return new JdbcUserDetailsManager(dataSource);
-    }
+//    @Bean
+//    public JdbcUserDetailsManager userDetailsService(DataSource dataSource){
+//        return new JdbcUserDetailsManager(dataSource);
+//    }
     @Bean
     public PasswordEncoder passwordEncoder(){
         return NoOpPasswordEncoder.getInstance();
