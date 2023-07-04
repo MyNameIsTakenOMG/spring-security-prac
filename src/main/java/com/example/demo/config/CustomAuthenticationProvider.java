@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.entity.Authority;
 import com.example.demo.entity.Customer;
 import com.example.demo.repository.CustomerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
@@ -29,15 +31,23 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         List<Customer> customers = customerRepo.findByEmail(username);
         if(customers.size()>0){
             if(passwordEncoder.matches(pwd,customers.get(0).getPwd())){
-                List<GrantedAuthority> authorities = new ArrayList<>();
-                authorities.add(new SimpleGrantedAuthority(customers.get(0).getRole()));
-                return new UsernamePasswordAuthenticationToken(username,pwd,authorities);
+//                List<GrantedAuthority> authorities = new ArrayList<>();
+//                authorities.add(new SimpleGrantedAuthority(customers.get(0).getRole()));
+                return new UsernamePasswordAuthenticationToken(username,pwd,getGrantedAuthority(customers.get(0).getAuthorities()));
             }else {
                 throw new BadCredentialsException("invalid password");
             }
         }else{
             throw new BadCredentialsException("no user found");
         }
+    }
+
+    private List<GrantedAuthority> getGrantedAuthority(Set<Authority> authorities){
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for(var authority : authorities){
+            grantedAuthorities.add(new SimpleGrantedAuthority(authority.getName()));
+        }
+        return grantedAuthorities;
     }
 
     @Override
