@@ -209,3 +209,6 @@ create table `authorities` (
  insert into `authorities` (`customer_id`,`name`) values(1, 'VIEWCARDS');
  insert into `authorities` (`customer_id`,`name`) values(1, 'VIEWBALANCE');
  insert into `authorities` (`customer_id`,`name`) values(1, 'VIEWLOAN');
+
+  insert into `authorities` (`customer_id`,`name`) values(1, 'ROLE_USER');
+  insert into `authorities` (`customer_id`,`name`) values(1, 'ROLE_ADMIN');

@@ -54,7 +54,15 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
                 })
                 .authorizeHttpRequests(requests->requests
-                .requestMatchers("/myAccount","/myBalance","/myLoan","/myCards").authenticated()
+//                        .requestMatchers("/myAccount").hasAnyAuthority("VIEWACCOUNT")
+//                        .requestMatchers("/myCards").hasAnyAuthority("VIEWCARDS")
+//                        .requestMatchers("/myLoan").hasAnyAuthority("VIEWLOAN")
+//                        .requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT","VIEWBALANCE")
+                        .requestMatchers("/myAccount").hasRole("USER")
+                        .requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/myLoans").hasRole("USER")
+                        .requestMatchers("/myCards").hasRole("USER")
+                .requestMatchers("/user").authenticated()
                 .requestMatchers("/notices","/contact","/register").permitAll())
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
