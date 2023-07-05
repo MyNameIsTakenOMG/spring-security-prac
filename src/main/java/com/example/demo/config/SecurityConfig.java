@@ -1,6 +1,9 @@
 package com.example.demo.config;
 
+import com.example.demo.error_handlers.CustomAccessDenied;
+import com.example.demo.error_handlers.CustomAuthenticationEntryPoint;
 import com.example.demo.filter.CSRFCookieFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -14,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -25,6 +29,12 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
+    @Autowired
+    private CustomAccessDenied customAccessDenied;
+    @Autowired
+    // AuthenticationEntryPoint can be overwritten for different scenarios
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -68,6 +78,10 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults());
 
         http.addFilterAfter(new CSRFCookieFilter(), BasicAuthenticationFilter.class);
+        http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
+            httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(customAccessDenied); // handle 403 unauthorized (need a customized accessDeniedHandler)
+            httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint); // handle 401 unauthenticated (need a customized authenticationEntryPoint)
+        });
         return http.build();
     }
 
