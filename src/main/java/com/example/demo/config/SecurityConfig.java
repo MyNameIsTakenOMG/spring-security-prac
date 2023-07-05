@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import com.example.demo.error_handlers.CustomAccessDenied;
 import com.example.demo.error_handlers.CustomAuthenticationEntryPoint;
+import com.example.demo.filter.AuthoritiesLoggingAfterFilter;
 import com.example.demo.filter.CSRFCookieFilter;
 import com.example.demo.filter.RequestValidationBeforeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,7 @@ public class SecurityConfig {
 
         http.addFilterAfter(new CSRFCookieFilter(), BasicAuthenticationFilter.class);
         http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class);
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
             httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(customAccessDenied); // handle 403 unauthorized (need a customized accessDeniedHandler)
             httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint); // handle 401 unauthenticated (need a customized authenticationEntryPoint)
