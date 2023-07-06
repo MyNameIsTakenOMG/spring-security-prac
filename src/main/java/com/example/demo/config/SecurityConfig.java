@@ -2,10 +2,13 @@ package com.example.demo.config;
 
 import com.example.demo.error_handlers.CustomAccessDenied;
 import com.example.demo.error_handlers.CustomAuthenticationEntryPoint;
+import com.example.demo.error_handlers.DelegateAccessDenied;
+import com.example.demo.error_handlers.DelegateAuthenticationEntryPoint;
 import com.example.demo.filter.AuthoritiesLoggingAfterFilter;
 import com.example.demo.filter.CSRFCookieFilter;
 import com.example.demo.filter.RequestValidationBeforeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -31,6 +34,12 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+//    @Autowired
+//    @Qualifier("DelegateAccessDenied")
+//    private DelegateAccessDenied delegateAccessDenied;
+//    @Autowired
+//    @Qualifier("DelegateAuthenticationEntryPoint")
+//    private DelegateAuthenticationEntryPoint delegateAuthenticationEntryPoint;
 
     @Autowired
     private CustomAccessDenied customAccessDenied;
@@ -83,6 +92,8 @@ public class SecurityConfig {
         http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
         http.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class);
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
+//            httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(delegateAccessDenied);
+//            httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(delegateAuthenticationEntryPoint);
             httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(customAccessDenied); // handle 403 unauthorized (need a customized accessDeniedHandler)
             httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint); // handle 401 unauthenticated (need a customized authenticationEntryPoint)
         });
