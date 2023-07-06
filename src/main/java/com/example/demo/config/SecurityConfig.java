@@ -2,10 +2,11 @@ package com.example.demo.config;
 
 import com.example.demo.error_handlers.CustomAccessDenied;
 import com.example.demo.error_handlers.CustomAuthenticationEntryPoint;
-import com.example.demo.error_handlers.DelegateAccessDenied;
-import com.example.demo.error_handlers.DelegateAuthenticationEntryPoint;
+//import com.example.demo.error_handlers.DelegateAccessDenied;
+//import com.example.demo.error_handlers.DelegateAuthenticationEntryPoint;
 import com.example.demo.filter.AuthoritiesLoggingAfterFilter;
 import com.example.demo.filter.CSRFCookieFilter;
+import com.example.demo.filter.JWTTokenGenerateFilter;
 import com.example.demo.filter.RequestValidationBeforeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +31,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -52,11 +54,14 @@ public class SecurityConfig {
         CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
         // by default "_csrf" csrfTokenRequestAttributeHandler.setCsrfRequestAttributeName("_csrf");
 
-        http.securityContext(httpSecuritySecurityContextConfigurer -> {
-            httpSecuritySecurityContextConfigurer.requireExplicitSave(false);
-        });
+//        http.securityContext(httpSecuritySecurityContextConfigurer -> {
+//            httpSecuritySecurityContextConfigurer.requireExplicitSave(false);
+//        });
+//        http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
+//            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+//        });
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
-            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         });
         http.cors(httpSecurityCorsConfigurer -> {
             httpSecurityCorsConfigurer.configurationSource(request -> {
@@ -66,6 +71,7 @@ public class SecurityConfig {
                 corsConfiguration.setAllowCredentials(true);
                 corsConfiguration.setMaxAge(3600L);
                 corsConfiguration.setAllowedHeaders(List.of("*"));
+                corsConfiguration.setExposedHeaders(List.of("Authorization"));
                 return corsConfiguration;
             });
         });
@@ -91,6 +97,7 @@ public class SecurityConfig {
         http.addFilterAfter(new CSRFCookieFilter(), BasicAuthenticationFilter.class);
         http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
         http.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(new JWTTokenGenerateFilter(),BasicAuthenticationFilter.class);
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
 //            httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(delegateAccessDenied);
 //            httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(delegateAuthenticationEntryPoint);
