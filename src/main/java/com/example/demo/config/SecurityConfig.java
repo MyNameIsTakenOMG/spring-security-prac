@@ -4,10 +4,7 @@ import com.example.demo.error_handlers.CustomAccessDenied;
 import com.example.demo.error_handlers.CustomAuthenticationEntryPoint;
 //import com.example.demo.error_handlers.DelegateAccessDenied;
 //import com.example.demo.error_handlers.DelegateAuthenticationEntryPoint;
-import com.example.demo.filter.AuthoritiesLoggingAfterFilter;
-import com.example.demo.filter.CSRFCookieFilter;
-import com.example.demo.filter.JWTTokenGenerateFilter;
-import com.example.demo.filter.RequestValidationBeforeFilter;
+import com.example.demo.filter.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -98,6 +95,7 @@ public class SecurityConfig {
         http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
         http.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class);
         http.addFilterAfter(new JWTTokenGenerateFilter(),BasicAuthenticationFilter.class);
+        http.addFilterBefore(new JWTTokenValidateFilter(), BasicAuthenticationFilter.class);
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
 //            httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(delegateAccessDenied);
 //            httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(delegateAuthenticationEntryPoint);
