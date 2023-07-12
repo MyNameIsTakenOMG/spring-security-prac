@@ -7,6 +7,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 public interface LoanRepo extends JpaRepository<Loans, Long> {
-    @PreAuthorize("hasRole('ROOT')")
+    //@PreAuthorize("hasRole('ROOT')")
     List<Loans> findByCustomerIdOrderByStartDtDesc(int customerId);
 }
