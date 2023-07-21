@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -57,6 +58,10 @@ public class SecurityConfig {
 //        http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
 //            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
 //        });
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeyCloakRoleConvertor());
+
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
             httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         });
@@ -88,14 +93,19 @@ public class SecurityConfig {
                         .requestMatchers("/myCards").hasRole("USER")
                 .requestMatchers("/user").authenticated()
                 .requestMatchers("/notices","/contact","/register").permitAll())
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults());
+//                .formLogin(Customizer.withDefaults())
+//                .httpBasic(Customizer.withDefaults());
+                .oauth2ResourceServer(httpSecurityOAuth2ResourceServerConfigurer -> {
+                    httpSecurityOAuth2ResourceServerConfigurer.jwt(jwtConfigurer -> {
+                        jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter);
+                    });
+                });
 
         http.addFilterAfter(new CSRFCookieFilter(), BasicAuthenticationFilter.class);
-        http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
-        http.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class);
-        http.addFilterAfter(new JWTTokenGenerateFilter(),BasicAuthenticationFilter.class);
-        http.addFilterBefore(new JWTTokenValidateFilter(), BasicAuthenticationFilter.class);
+//        http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
+//        http.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class);
+//        http.addFilterAfter(new JWTTokenGenerateFilter(),BasicAuthenticationFilter.class);
+//        http.addFilterBefore(new JWTTokenValidateFilter(), BasicAuthenticationFilter.class);
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
 //            httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(delegateAccessDenied);
 //            httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(delegateAuthenticationEntryPoint);
@@ -123,9 +133,12 @@ public class SecurityConfig {
 //    public JdbcUserDetailsManager userDetailsService(DataSource dataSource){
 //        return new JdbcUserDetailsManager(dataSource);
 //    }
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-//        return NoOpPasswordEncoder.getInstance();
-        return new BCryptPasswordEncoder();
-    }
+
+
+// as a resource server, we reply on KeyCloak to authenticate users
+//    @Bean
+//    public PasswordEncoder passwordEncoder(){
+////        return NoOpPasswordEncoder.getInstance();
+//        return new BCryptPasswordEncoder();
+//    }
 }

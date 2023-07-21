@@ -15,7 +15,7 @@ import java.util.Set;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "mobile_number")
     private String mobileNumber;
@@ -25,6 +25,10 @@ public class Customer {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String pwd;
     private String role;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "customer", fetch = FetchType.EAGER)
+    private Account account;
 
     @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
@@ -41,11 +45,11 @@ public class Customer {
     public Customer() {
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -73,7 +77,7 @@ public class Customer {
         this.role = role;
     }
 
-    public Customer(int id, String email, String pwd, String role) {
+    public Customer(Long id, String email, String pwd, String role) {
         this.id = id;
         this.email = email;
         this.pwd = pwd;
